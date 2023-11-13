@@ -19,7 +19,29 @@ type schemaValidationSettings struct {
 	onceSettingDefaults sync.Once
 	defaultsSet         func()
 
-	customizeMessageError func(err *SchemaError) string
+	customizeMessageError  func(err *SchemaError) string
+	customizeSchemaResolve func(string) *Schema
+}
+
+func (s *schemaValidationSettings) schemaResolve(schemaRef *SchemaRef) (value *Schema) {
+	if s.customizeSchemaResolve == nil {
+		return
+	}
+
+	if value = schemaRef.Value; value != nil {
+		return
+	}
+
+	if ref := schemaRef.Ref; len(ref) > 0 {
+		value = s.customizeSchemaResolve(ref)
+	}
+	return
+}
+
+// SetCustomizeSchemaResolve allows to fetch custom schema for not empty ref.
+// If the passed function returns *Schema.
+func SetCustomizeSchemaResolve(resolve func(string) *Schema) SchemaValidationOption {
+	return func(s *schemaValidationSettings) { s.customizeSchemaResolve = resolve }
 }
 
 // FailFast returns schema validation errors quicker.

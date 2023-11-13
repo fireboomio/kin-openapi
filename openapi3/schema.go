@@ -1195,7 +1195,7 @@ func (schema *Schema) visitEnumOperation(settings *schemaValidationSettings, val
 
 func (schema *Schema) visitNotOperation(settings *schemaValidationSettings, value interface{}) (err error) {
 	if ref := schema.Not; ref != nil {
-		v := ref.Value
+		v := settings.schemaResolve(ref)
 		if v == nil {
 			return foundUnresolvedRef(ref.Ref)
 		}
@@ -1260,7 +1260,7 @@ func (schema *Schema) visitXOFOperations(settings *schemaValidationSettings, val
 			tempValue           = value
 		)
 		for idx, item := range v {
-			v := item.Value
+			v := settings.schemaResolve(item)
 			if v == nil {
 				return foundUnresolvedRef(item.Ref), false
 			}
@@ -1318,7 +1318,7 @@ func (schema *Schema) visitXOFOperations(settings *schemaValidationSettings, val
 			tempValue       = value
 		)
 		for idx, item := range v {
-			v := item.Value
+			v := settings.schemaResolve(item)
 			if v == nil {
 				return foundUnresolvedRef(item.Ref), false
 			}
@@ -1350,7 +1350,7 @@ func (schema *Schema) visitXOFOperations(settings *schemaValidationSettings, val
 	}
 
 	for _, item := range schema.AllOf {
-		v := item.Value
+		v := settings.schemaResolve(item)
 		if v == nil {
 			return foundUnresolvedRef(item.Ref), false
 		}
@@ -1778,7 +1778,7 @@ func (schema *Schema) visitJSONArray(settings *schemaValidationSettings, value [
 
 	// "items"
 	if itemSchemaRef := schema.Items; itemSchemaRef != nil {
-		itemSchema := itemSchemaRef.Value
+		itemSchema := settings.schemaResolve(itemSchemaRef)
 		if itemSchema == nil {
 			return foundUnresolvedRef(itemSchemaRef.Ref)
 		}
@@ -1899,7 +1899,7 @@ func (schema *Schema) visitJSONObject(settings *schemaValidationSettings, value 
 		if properties != nil {
 			propertyRef := properties[k]
 			if propertyRef != nil {
-				p := propertyRef.Value
+				p := settings.schemaResolve(propertyRef)
 				if p == nil {
 					return foundUnresolvedRef(propertyRef.Ref)
 				}
