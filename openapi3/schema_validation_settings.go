@@ -24,11 +24,7 @@ type schemaValidationSettings struct {
 }
 
 func (s *schemaValidationSettings) schemaResolve(schemaRef *SchemaRef) (value *Schema) {
-	if s.customizeSchemaResolve == nil {
-		return
-	}
-
-	if value = schemaRef.Value; value != nil {
+	if value = schemaRef.Value; value != nil || s.customizeSchemaResolve == nil {
 		return
 	}
 
