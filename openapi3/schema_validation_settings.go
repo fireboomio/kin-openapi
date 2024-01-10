@@ -8,13 +8,14 @@ import (
 type SchemaValidationOption func(*schemaValidationSettings)
 
 type schemaValidationSettings struct {
-	failfast                    bool
-	multiError                  bool
-	asreq, asrep                bool // exclusive (XOR) fields
-	formatValidationEnabled     bool
-	patternValidationDisabled   bool
-	readOnlyValidationDisabled  bool
-	writeOnlyValidationDisabled bool
+	failfast                         bool
+	multiError                       bool
+	asreq, asrep                     bool // exclusive (XOR) fields
+	formatValidationEnabled          bool
+	unknownPropertyValidationEnabled bool
+	patternValidationDisabled        bool
+	readOnlyValidationDisabled       bool
+	writeOnlyValidationDisabled      bool
 
 	onceSettingDefaults sync.Once
 	defaultsSet         func()
@@ -55,6 +56,11 @@ func VisitAsRequest() SchemaValidationOption {
 
 func VisitAsResponse() SchemaValidationOption {
 	return func(s *schemaValidationSettings) { s.asreq, s.asrep = false, true }
+}
+
+// EnableUnknownPropertyValidation setting makes Validate return an error when validating documents that miss property schema.
+func EnableUnknownPropertyValidation() SchemaValidationOption {
+	return func(s *schemaValidationSettings) { s.unknownPropertyValidationEnabled = true }
 }
 
 // EnableFormatValidation setting makes Validate not return an error when validating documents that mention schema formats that are not defined by the OpenAPIv3 specification.

@@ -1919,6 +1919,22 @@ func (schema *Schema) visitJSONObject(settings *schemaValidationSettings, value 
 				}
 				continue
 			}
+			if settings.unknownPropertyValidationEnabled {
+				if settings.failfast {
+					return errSchema
+				}
+				err := markSchemaErrorKey(&SchemaError{
+					Value:                 value,
+					Schema:                schema,
+					SchemaField:           "properties",
+					Reason:                fmt.Sprintf("unknown property %s", k),
+					customizeMessageError: settings.customizeMessageError,
+				}, k)
+				if !settings.multiError {
+					return err
+				}
+				me = append(me, err)
+			}
 		}
 		if allowed := schema.AdditionalProperties.Has; allowed == nil || *allowed {
 			if additionalProperties != nil {
